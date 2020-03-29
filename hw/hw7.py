@@ -27,7 +27,7 @@ def tridiag(x,y):
     Arr = np.zeros([arrSize,arrSize])
     r = np.zeros([arrSize])
     for i in range(len(Arr)):
-        #print(Arr)
+        print(Arr)
         j = i+1
         lenx = len(x)
         d1 = (x[i+1]-x[i])
