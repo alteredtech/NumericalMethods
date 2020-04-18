@@ -1,28 +1,25 @@
-import numpy as np
+import numpy as np 
 
-def rk4(x,y,h,derivs,params):
+def rk4(x,y,h,derivs, params):
+    ym = y.copy()
+    ye = y.copy()
     n = len(y)
-    ymidpoint=[0 for e in range(n)]
-    yend=[0 for e in range(n)]
-    slope=[0 for e in range(n)]
-    ynew=[0 for e in range(n)]
-    k1 = derivs(x,y,params)
+    slope = y.copy()
+    ynew = y.copy()
+    k1 = derivs(x, y,params)
     for i in range(n):
-        # print("i")
-        ymidpoint[i]=y[i] + k1[i]*h/2
-    k2 = derivs(x+h/2,ymidpoint,params)
-    for j in range(n):
-        # print("j")
-        ymidpoint[j]=y[j] + k2[j]*h/2
-    k3 = derivs(x+h/2,ymidpoint,params)
-    for k in range(n):
-        # print("k")
-        yend[k]=y[k]+k3[k]*h
-    k4 = derivs(x+h,yend,params)
-    for l in range(n):
-        # print("l")
-        slope[l]=(k1[l]+2*(k2[l]+k3[l])+k4[l])/6
-        ynew[l]=y[l] + slope[l]*h
+        ym[i] = y[i] + k1[i] * h / 2
+    k2 = derivs(x + h / 2, ym,params)
+    for i in range(n):
+        ym[i] = y[i] + k2[i] * h /2
+    k3 = derivs(x + h / 2, ym,params)
+    for i in range(n):
+        ye[i] = y[i] + k3[i] * h
+    k4 = derivs(x + h, ye,params)
+    for i in range(n):
+        slope[i] = (k1[i] + 2*(k2[i] + k3[i]) + k4[i]) / 6
+        ynew[i] = y[i] + slope[i] * h
+    print(ynew)
     return ynew
 
 def unwrap(dq):
@@ -81,10 +78,3 @@ def simulate(tstart, tend, h, bot, goal):
             v = np.sqrt(bot['state']['vx']*bot['state']['vx'] + bot['state']['vy']*bot['state']['vy'])
             w.write("{} {} {} {} {} {}\n".format(t,bot['state']['x'],bot['state']['y'],v,bot['wheel_torque'],bot['steer_angle']))
             print(bot["state"]["x"],bot["state"]["y"])
-
-if __name__ == '__main__':
-    bot = {"state":{"x":0,"y":0,"yaw":0,"vx":0,"vy":0},
-        "mass":1,"wheel_base":1,"drag_coefficient":1,"wheel_radius":0.1,
-        "wheel_torque":1,"steer_angle":0.1}
-    goal = {"x":-40, "y":10}
-    simulate(0, 20, 0.1, bot, goal)
