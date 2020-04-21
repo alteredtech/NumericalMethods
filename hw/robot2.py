@@ -81,7 +81,7 @@ def simulate(tstart, tend, h, bot, goal):
       print(bot["state"]["x"],bot["state"]["y"])
 
 if __name__ == '__main__':
-  from SplinedPath import SplinedPath
+  from NumericalMethods.hw.SplinedPath import SplinedPath
   n = 20
   s = [5*ii/(n-1) for ii in range(n)]
   y = [10*math.cos(si) - 10 for si in s]
