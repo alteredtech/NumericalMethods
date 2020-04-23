@@ -11,8 +11,8 @@ class SplinedPath:
             dx = x[ii] - x[ii-1]
             dy = y[ii] - y[ii-1]
             self.s.append(self.s[-1] + math.sqrt(dx*dx+dy*dy))
-        self.d2x = cubic_spline(s,x)#TODO Get the second derivative of the cubic spline x(s) at each knot (remember first and last should be zero)
-        self.d2y = cubic_spline(s,y)#TODO Get the second derivative of the cubic spline y(s) at each knot (remember first and last should be zero)
+        self.d2x = cubic_spline(x,self.s)#TODO Get the second derivative of the cubic spline x(s) at each knot (remember first and last should be zero)
+        self.d2y = cubic_spline(y,self.s)#TODO Get the second derivative of the cubic spline y(s) at each knot (remember first and last should be zero)
     
     def nearest(self,botx,boty,botyaw):
         en = 0  # Normal error (perpendicular distance from botx,boty to the nearest point on the cubic spline path)
@@ -35,17 +35,23 @@ class SplinedPath:
                 length_remaining = Ltot - ss
                 if ss < Ltot:#TODO make sure ss is in range if it is then
                     #TODO Get x(ss), dxds(ss), d2xds2(ss)
-                    xu,dxds,d2xds2 = interpolate(ss,x,d2x,length_remaining)
+                    xu,dxds,d2xds2 = interpolate(self.s,self.x,self.d2x,ss)
                     #TODO Get y(ss), dyds(ss), d2yds2(ss)
-                    yu,dyds,d2yds2 = interpolate(ss,y,d2y,length_remaining)
+                    yu,dyds,d2yds2 = interpolate(self.s,self.y,self.d2y,ss)
                     q = math.atan2(dyds,dxds)#TODO, get the path heading HINT: all you need are dxds and dyds
                     qp = q-math.pi/2 # This is going to point perpendicularly to the right of the direction of travel along the path
-                    en = (botx-x(ss))*math.cos(qp) + (boty-y(ss))*math.sin(qp)# TODO Normal error ==> (botx-x(ss))*math.cos(qp) + (boty-y(ss))*math.sin(qp)
-                    eh = np.unwrap(q-botyaw,math.pi) - np.unwrap(q-botyaw,-1*math.pi) # TODO unwrap(q-botyaw) <== unwrap to between -pi and pi
-                    kff = abs(dxds*d2yds2-dyds*d2xds2)/(dxds**2-dyds**2)**(2/3) # Curvature of the path. You will find the formula for this under the sub-topic "In terms of a general parameterization" at https://en.wikipedia.org/wiki/Curvature You will need dxds(ss), d2xds2(ss), dyds(ss), and d2yds2(ss)
+                    en = (botx-xu)*math.cos(qp) + (boty-yu)*math.sin(qp)# TODO Normal error ==> (botx-x(ss))*math.cos(qp) + (boty-y(ss))*math.sin(qp)
+                    # eh = diff(np.unwrap(q-botyaw,-1*math.pi),np.unwrap(q-botyaw,math.pi)) #np.unwrap(q-botyaw,math.pi) - np.unwrap(q-botyaw,-1*math.pi) # TODO unwrap(q-botyaw) <== unwrap to between -pi and pi
+                    eh = unwrap(q-botyaw)
+                    kff = abs(dxds * d2yds2 - dyds * d2xds2) / (dxds**2 + dyds**2)**(3.0/2) # Curvature of the path. You will find the formula for this under the sub-topic "In terms of a general parameterization" at https://en.wikipedia.org/wiki/Curvature You will need dxds(ss), d2xds2(ss), dyds(ss), and d2yds2(ss)
                 break
         return (en,eh,kff,length_remaining)
 
+# def diff(list1,list2):
+#     return list(set(list1)-set(list2))
+
+def unwrap(dq):
+  return ((dq+math.pi)%(2*math.pi))-math.pi
 
 def cubic_spline(x,y):
     (A,r) = tridiag(x,y)
@@ -54,8 +60,11 @@ def cubic_spline(x,y):
     return d2x
     
 def interpolate(x,y,d2x,xu):
+    flag = 0
     n = len(x)
     for i in range(1,n):
+        if flag == 1:
+            break
         if xu >= x[i-1] and xu < x[i]:
             c1 = d2x[i-1]/6/(x[i]-x[i-1])
             c2 = d2x[i]/6/(x[i]-x[i-1])
@@ -74,15 +83,15 @@ def interpolate(x,y,d2x,xu):
             t1 = 6 * c1 * (x[i] - xu)
             t2 = 6 * c2 * (xu - x[i-1])
             d2y = t1 + t2
-            return (yu,dy,d2y)
-    return (0,0)
+            flag = 1
+    return (yu,dy,d2y)
 
 def tridiag(x,y):
     arrSize = len(x)-2
     Arr = np.zeros([arrSize,arrSize])
     r = np.zeros([arrSize])
     for i in range(len(Arr)):
-        print(Arr)
+        # print(Arr)
         j = i+1
         lenx = len(x)
         d1 = (x[i+1]-x[i])

@@ -37,6 +37,13 @@ def diff(list1,list2):
         return(list(set(list1)-set(list2)))
 
 if __name__ == "__main__":
+    dxds = -4.81
+    d2yds2 = -0.00091
+    dyds = -4.824
+    d2xds2 = -0.006325
+    kff1 = abs(dxds*d2yds2-dyds*d2xds2)/(dxds**2+dyds**2)**(3.0/2)
+    print(kff1)
+    print(pow(8,3.0/2))
 
     # n = 7
     # l1 = [random.random() for i in range(n)]
@@ -52,15 +59,15 @@ if __name__ == "__main__":
     # print('\n\n\n\n\n')
     # print(uwl1,uwl1_2,uwl2,uwl3)
 
-    l1 =[5, 7, 10, 14, 19, 25, 32] 
-    uw1=np.unwrap(l1, discont = -1*math.pi)
-    print("Result 1: ", uw1) 
+        # l1 =[5, 7, 10, 14, 19, 25, 32] 
+        # uw1=np.unwrap(l1, discont = -1*math.pi)
+        # print("Result 1: ", uw1) 
   
-    l2 =[0, 1.34237486723, 4.3453455, 8.134654756, 9.3465456542] 
-    uw2 = np.unwrap(l2, discont = math.pi)
-    print("Result 2: ", uw2) 
+        # l2 =[0, 1.34237486723, 4.3453455, 8.134654756, 9.3465456542] 
+        # uw2 = np.unwrap(l2, discont = math.pi)
+        # print("Result 2: ", uw2) 
 
-    print('sub', diff(uw1,uw2))
+        # print('sub', diff(uw1,uw2))
 
 
 
