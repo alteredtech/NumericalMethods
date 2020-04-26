@@ -37,7 +37,7 @@ def ADMM(A, y):
     maximum = np.maximum
     absolute = np.absolute
 
-    for _ in xrange(MAX_ITER):
+    for _ in range(MAX_ITER):
         #x minimisation step via posterier OLS
         x_hat = Q_dot(A_t_y + rho*(z_hat - u))
         #z minimisation via soft-thresholding
